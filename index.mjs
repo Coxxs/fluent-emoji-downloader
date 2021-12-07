@@ -4,8 +4,6 @@ import fetch from "node-fetch"
 import pLimit from "p-limit"
 import fs from 'fs-extra'
 
-const limit = pLimit(10)
-
 function fetchStatic(url) {
   return fetch(url, {
     "headers": {
@@ -36,8 +34,10 @@ const endpoint = 'https://statics.teams.cdn.live.net/evergreen-assets/personal-e
 const metadata = 'v1/metadata/8479a21d47934aed85d6d6f236847484/en-us.json'
 const version = 'v2'
 const animated = false
+const maxThreads = 10
 
 const outputDir = 'output_' + version + (animated ? '_animated' : '')
+const limit = pLimit(maxThreads)
 
 if (!fs.existsSync('emoji.json')){
   let response = await fetchStatic(endpoint + metadata)
