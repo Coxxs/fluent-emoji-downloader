@@ -4,27 +4,28 @@ import fetch from "node-fetch"
 import pLimit from "p-limit"
 import fs from 'fs-extra'
 
-const limit = pLimit(20)
+const limit = pLimit(10)
 
 function fetchStatic(url) {
   return fetch(url, {
     "headers": {
       "Referer": "https://teams.live.com/",
-      "Referrer-Policy": "strict-origin-when-cross-origin",
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36",
     }
   })
 }
 
 async function downloadAndSave(url, file) {
-  for (let i = 0; i < 3; i++) {
+  let tries = 0
+  while (true) {
     try {
       let response = await fetchStatic(url)
       let data = await response.arrayBuffer()
       await fs.outputFile(file, Buffer.from(data))
       return
     } catch (err) {
-      if (i >= 2) {
+      tries++
+      if (tries >= 3) {
         throw err
       }
     }
