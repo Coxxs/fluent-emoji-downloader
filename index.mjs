@@ -2,7 +2,7 @@
 
 import fetch from "node-fetch"
 import pLimit from "p-limit"
-import { promises as fs } from 'fs'
+import fs from 'fs-extra'
 
 const limit = pLimit(20)
 
@@ -20,23 +20,14 @@ async function downloadAndSave(url, file) {
   for (let i = 0; i < 3; i++) {
     try {
       let response = await fetchStatic(url)
-      let data = await response.buffer()
-      await fs.writeFile(file, data)
+      let data = await response.arrayBuffer()
+      await fs.outputFile(file, Buffer.from(data))
       return
     } catch (err) {
       if (i >= 2) {
         throw err
       }
     }
-  }
-}
-
-async function checkExists(file) {
-  try {
-    await fs.access(file)
-    return true
-  } catch (err) {
-    return false
   }
 }
 
@@ -47,7 +38,7 @@ const animated = false
 
 const outputDir = 'output_' + version + (animated ? '_animated' : '')
 
-if (!await checkExists('emoji.json')){
+if (!fs.existsSync('emoji.json')){
   let response = await fetchStatic(endpoint + metadata)
   let data = await response.json()
   await fs.writeFile('emoji.json', JSON.stringify(data, null, '\t'))
@@ -55,15 +46,8 @@ if (!await checkExists('emoji.json')){
 
 let emojiList = JSON.parse(await fs.readFile('emoji.json'))
 
-if (!await checkExists(outputDir)) {
-  await fs.mkdir(outputDir)
-}
-
 for (const category of emojiList.categories) {
   let categoryDir = outputDir + '/' + category.title
-  if (!await checkExists(categoryDir)) {
-    await fs.mkdir(categoryDir)
-  }
   for (const emoji of category.emoticons) {
     const anim = (animated ? '_anim' : '')
     limit(() => downloadAndSave(`${endpoint}${version}/assets/emoticons/${emoji.id}/default/100${anim}_f.png?${emoji.etag}`, `${categoryDir}/${emoji.id}.png`))

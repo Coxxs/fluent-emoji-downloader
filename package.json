@@ -8,6 +8,7 @@
   },
   "author": "Coxxs",
   "dependencies": {
+    "fs-extra": "^10.0.0",
     "node-fetch": "^3.1.0",
     "p-limit": "^4.0.0"
   }
