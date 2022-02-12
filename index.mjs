@@ -31,7 +31,7 @@ async function downloadAndSave(url, file) {
 }
 
 const endpoint = 'https://statics.teams.cdn.live.net/evergreen-assets/personal-expressions/'
-const metadata = 'v1/metadata/8479a21d47934aed85d6d6f236847484/en-us.json'
+const metadata = 'v1/metadata/fa6ddff9337d4d55bf685c5241ed3710/en-us.json'
 const version = 'v2'
 const animated = false
 const maxThreads = 10
